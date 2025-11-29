@@ -36,6 +36,9 @@ def load_quests(filename="data/quests.txt"):
     Returns: Dictionary of quests {quest_id: quest_data_dict}
     Raises: MissingDataFileError, InvalidDataFormatError, CorruptedDataError
     """
+    with open(filename,"r"):
+        for line in filename:
+            quest_id = line.split()
     # TODO: Implement this function
     # Must handle:
     # - FileNotFoundError → raise MissingDataFileError
