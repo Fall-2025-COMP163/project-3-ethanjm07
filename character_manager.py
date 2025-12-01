@@ -180,7 +180,7 @@ def load_character(character_name, save_directory="data/save_games"):
             character['active_quests'] = value.split(",") if value else []
         elif key == "COMPLETED_QUESTS":
             character['completed_quests'] = value.split(",") if value else []
-    return print(character)
+    return character
     # TODO: Implement load functionality
     # Check if file exists → CharacterNotFoundError
     # Try to read file → SaveFileCorruptedError
