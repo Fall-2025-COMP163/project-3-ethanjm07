@@ -146,6 +146,13 @@ def load_character(character_name, save_directory="data/save_games"):
     try:
         for line in lines:
             key, value = line.strip().split(": ", 1)
+
+            if not line:
+                    raise InvalidSaveDataError("Blank line in save file.")
+            
+            if ": " not in line:
+                raise InvalidSaveDataError(f"Malformed line: '{line}'")
+            
             if key == "NAME":
                 character['name'] = value
             elif key == "CLASS":
