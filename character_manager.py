@@ -134,26 +134,33 @@ def load_character(character_name, save_directory="data/save_games"):
         SaveFileCorruptedError if file exists but can't be read
         InvalidSaveDataError if data format is wrong
     """
-    filename = os.path.join(save_directory, f"{character_name}_save.txt")
-    if not os.path.exists(filename):
+    filename = save_directory + "/" + character_name + "_save.txt"
+    try:
+        with open(filename, "r") as file:
+            lines = file.readlines()
+    except FileNotFoundError:
         raise CharacterNotFoundError(f"Character '{character_name}' not found.")
+    except Exception as e:
+        raise SaveFileCorruptedError(f"Could not read save file: {e}")
+
+    character = {}
     try:
         with open(filename, "r") as file:
             lines = file.readlines()
     except Exception as e:
         raise SaveFileCorruptedError(f"Could not read save file: {e}")
-    character = {}
+    
     
     for line in lines:
         line = line.strip()
 
         # Skip truly empty lines but treat them as errors if you want strict validation
-    if not line:
-        raise InvalidSaveDataError("Blank line in save file.")
+        if not line:
+            raise InvalidSaveDataError("Blank line in save file.")
 
     # Check format BEFORE splitting 
-    if ": " not in line:
-        raise InvalidSaveDataError(f"Malformed line: '{line}'")
+        if ": " not in line:
+            raise InvalidSaveDataError(f"Malformed line: {line}")
 
     key, value = line.split(": ", 1)
 
@@ -181,6 +188,7 @@ def load_character(character_name, save_directory="data/save_games"):
         character['active_quests'] = value.split(",") if value else []
     elif key == "COMPLETED_QUESTS":
         character['completed_quests'] = value.split(",") if value else []
+    return character
     # TODO: Implement load functionality
     # Check if file exists → CharacterNotFoundError
     # Try to read file → SaveFileCorruptedError
@@ -370,20 +378,25 @@ if __name__ == "__main__":
     #     print(f"Stats: HP={char['health']}, STR={char['strength']}, MAG={char['magic']}")
     # except InvalidCharacterClassError as e:
     #     print(f"Invalid class: {e}")
+    try:
+        char = create_character("TestHero", "Warrior")
+        print(f"Created: {char['name']} the {char['class']}")
+        print(f"Stats: HP={char['health']}, STR={char['strength']}, MAG={char['magic']}")
+    except InvalidCharacterClassError as e:
+        print(f"Invalid class: {e}")
+    print("Test saving")
+    try:
+        save_character(char)
+        print("Character saved successfully")
+    except Exception as e:
+        print(f"Save error: {e}")
     
-    # Test saving
-    # try:
-    #     save_character(char)
-    #     print("Character saved successfully")
-    # except Exception as e:
-    #     print(f"Save error: {e}")
-    
-    # Test loading
-    # try:
-    #     loaded = load_character("TestHero")
-    #     print(f"Loaded: {loaded['name']}")
-    # except CharacterNotFoundError:
-    #     print("Character not found")
-    # except SaveFileCorruptedError:
-    #     print("Save file corrupted")
+    #Test loading
+    try:
+        loaded = load_character("TestHero")
+        print(f"Loaded: {loaded['name']}")
+    except CharacterNotFoundError:
+        print("Character not found")
+    except SaveFileCorruptedError:
+        print("Save file corrupted")
 
