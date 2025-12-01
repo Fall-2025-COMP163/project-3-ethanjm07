@@ -146,7 +146,7 @@ def load_character(character_name, save_directory="data/save_games"):
         with open(filename, "r") as file:
             lines = file.readlines()
     except Exception as e:
-        raise SaveFileCorruptedError(f"Could not read save file for '{character_name}': {e}")
+        raise SaveFileCorruptedError(f"Could not read save file: {e}")
     character = {}
     try:
         for line in lines:
@@ -176,7 +176,7 @@ def load_character(character_name, save_directory="data/save_games"):
             elif key == "COMPLETED_QUESTS":
                 character['completed_quests'] = value.split(",") if value else []
     except Exception as e:
-        raise InvalidSaveDataError(f"Invalid save data format for '{character_name}': {e}")
+        raise InvalidSaveDataError(f"Invalid save data format: {e}")
     return character
     # TODO: Implement load functionality
     # Check if file exists → CharacterNotFoundError
