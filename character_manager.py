@@ -135,14 +135,6 @@ def load_character(character_name, save_directory="data/save_games"):
         InvalidSaveDataError if data format is wrong
     """
     filename = save_directory + "/" + character_name + "_save.txt"
-    try:
-        with open(filename, "r") as file:
-            lines = file.readlines()
-    except FileNotFoundError:
-        raise CharacterNotFoundError(f"Character '{character_name}' not found.")
-    except Exception as e:
-        raise SaveFileCorruptedError(f"Could not read save file: {e}")
-
     character = {}
     try:
         with open(filename, "r") as file:
@@ -158,11 +150,9 @@ def load_character(character_name, save_directory="data/save_games"):
         if not line:
             raise InvalidSaveDataError("Blank line in save file.")
 
-    # Check format BEFORE splitting 
-        if ": " not in line:
-            raise InvalidSaveDataError(f"Malformed line: {line}")
+    #
 
-    key, value = line.split(": ", 1)
+    key, value = line.split(":")
 
     if key == "NAME":
         character['name'] = value
@@ -394,7 +384,7 @@ if __name__ == "__main__":
     #Test loading
     try:
         loaded = load_character("TestHero")
-        print(f"Loaded: {loaded['name']}")
+        print(loaded)
     except CharacterNotFoundError:
         print("Character not found")
     except SaveFileCorruptedError:
