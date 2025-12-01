@@ -73,7 +73,7 @@ def create_character(name, character_class):
     # - inventory=[], active_quests=[], completed_quests=[]
     
     # Raise InvalidCharacterClassError if class not in valid list
-    pass
+    
 
 def save_character(character, save_directory="data/save_games"):
     """
@@ -147,12 +147,43 @@ def load_character(character_name, save_directory="data/save_games"):
             lines = file.readlines()
     except Exception as e:
         raise SaveFileCorruptedError(f"Could not read save file for '{character_name}': {e}")
+    character = {}
+    try:
+        for line in lines:
+            key, value = line.strip().split(": ", 1)
+            if key == "NAME":
+                character['name'] = value
+            elif key == "CLASS":
+                character['class'] = value
+            elif key == "LEVEL":
+                character['level'] = int(value)
+            elif key == "HEALTH":
+                character['health'] = int(value)
+            elif key == "MAX_HEALTH":
+                character['max_health'] = int(value)
+            elif key == "STRENGTH":
+                character['strength'] = int(value)
+            elif key == "MAGIC":
+                character['magic'] = int(value)
+            elif key == "EXPERIENCE":
+                character['experience'] = int(value)
+            elif key == "GOLD":
+                character['gold'] = int(value)
+            elif key == "INVENTORY":
+                character['inventory'] = value.split(",") if value else []
+            elif key == "ACTIVE_QUESTS":
+                character['active_quests'] = value.split(",") if value else []
+            elif key == "COMPLETED_QUESTS":
+                character['completed_quests'] = value.split(",") if value else []
+    except Exception as e:
+        raise InvalidSaveDataError(f"Invalid save data format for '{character_name}': {e}")
+    return character
     # TODO: Implement load functionality
     # Check if file exists → CharacterNotFoundError
     # Try to read file → SaveFileCorruptedError
     # Validate data format → InvalidSaveDataError
     # Parse comma-separated lists back into Python lists
-    pass
+    
 
 def list_saved_characters(save_directory="data/save_games"):
     """
