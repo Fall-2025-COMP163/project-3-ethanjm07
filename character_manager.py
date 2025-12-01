@@ -143,11 +143,11 @@ def load_character(character_name, save_directory="data/save_games"):
     except Exception as e:
         raise SaveFileCorruptedError(f"Could not read save file: {e}")
     character = {}
-    try:
-        for line in lines:
+    
+    for line in lines:
         line = line.strip()
 
-    # Skip truly empty lines but treat them as errors if you want strict validation
+        # Skip truly empty lines but treat them as errors if you want strict validation
     if not line:
         raise InvalidSaveDataError("Blank line in save file.")
 
@@ -181,7 +181,6 @@ def load_character(character_name, save_directory="data/save_games"):
         character['active_quests'] = value.split(",") if value else []
     elif key == "COMPLETED_QUESTS":
         character['completed_quests'] = value.split(",") if value else []
-    return character
     # TODO: Implement load functionality
     # Check if file exists → CharacterNotFoundError
     # Try to read file → SaveFileCorruptedError
