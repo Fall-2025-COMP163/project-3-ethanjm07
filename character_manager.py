@@ -145,40 +145,42 @@ def load_character(character_name, save_directory="data/save_games"):
     character = {}
     try:
         for line in lines:
-            key, value = line.strip().split(": ", 1)
+        line = line.strip()
 
-            if not line:
-                    raise InvalidSaveDataError("Blank line in save file.")
-            
-            if ": " not in line:
-                raise InvalidSaveDataError(f"Malformed line: '{line}'")
-            
-            if key == "NAME":
-                character['name'] = value
-            elif key == "CLASS":
-                character['class'] = value
-            elif key == "LEVEL":
-                character['level'] = int(value)
-            elif key == "HEALTH":
-                character['health'] = int(value)
-            elif key == "MAX_HEALTH":
-                character['max_health'] = int(value)
-            elif key == "STRENGTH":
-                character['strength'] = int(value)
-            elif key == "MAGIC":
-                character['magic'] = int(value)
-            elif key == "EXPERIENCE":
-                character['experience'] = int(value)
-            elif key == "GOLD":
-                character['gold'] = int(value)
-            elif key == "INVENTORY":
-                character['inventory'] = value.split(",") 
-            elif key == "ACTIVE_QUESTS":
-                character['active_quests'] = value.split(",")
-            elif key == "COMPLETED_QUESTS":
-                character['completed_quests'] = value.split(",")
-    except Exception as e:
-        raise InvalidSaveDataError(f"Invalid save data format: {e}")
+    # Skip truly empty lines but treat them as errors if you want strict validation
+    if not line:
+        raise InvalidSaveDataError("Blank line in save file.")
+
+    # Check format BEFORE splitting 
+    if ": " not in line:
+        raise InvalidSaveDataError(f"Malformed line: '{line}'")
+
+    key, value = line.split(": ", 1)
+
+    if key == "NAME":
+        character['name'] = value
+    elif key == "CLASS":
+        character['class'] = value
+    elif key == "LEVEL":
+        character['level'] = int(value)
+    elif key == "HEALTH":
+        character['health'] = int(value)
+    elif key == "MAX_HEALTH":
+        character['max_health'] = int(value)
+    elif key == "STRENGTH":
+        character['strength'] = int(value)
+    elif key == "MAGIC":
+        character['magic'] = int(value)
+    elif key == "EXPERIENCE":
+        character['experience'] = int(value)
+    elif key == "GOLD":
+        character['gold'] = int(value)
+    elif key == "INVENTORY":
+        character['inventory'] = value.split(",") if value else []
+    elif key == "ACTIVE_QUESTS":
+        character['active_quests'] = value.split(",") if value else []
+    elif key == "COMPLETED_QUESTS":
+        character['completed_quests'] = value.split(",") if value else []
     return character
     # TODO: Implement load functionality
     # Check if file exists → CharacterNotFoundError
