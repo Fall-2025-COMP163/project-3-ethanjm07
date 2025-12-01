@@ -180,7 +180,14 @@ def equip_weapon(character, item_id, item_data):
     if 'equipped_weapon' in character and character['equipped_weapon'] is not None:
         # Unequip current weapon
         unequip_weapon(character, item_data)
+    stat_name, value = parse_item_effect(item_data['effect'])
+    apply_stat_effect(character, stat_name, value)
     
+    # Remove from inventory and mark as equipped
+    character['inventory'].remove(item_id)
+    character['equipped_weapon'] = item_id
+
+    return f"Equipped {item_id}, {stat_name} increased by {value}."
     # TODO: Implement weapon equipping
     # Check item exists and is type 'weapon'
     # Handle unequipping current weapon if exists
@@ -216,6 +223,14 @@ def equip_armor(character, item_id, item_data):
     if 'equipped_armor' in character and character['equipped_armor'] is not None:
         # Unequip current armor
         unequip_armor(character, item_data)
+    stat_name, value = parse_item_effect(item_data['effect'])
+    apply_stat_effect(character, stat_name, value)
+    
+    # Remove from inventory and mark as equipped
+    character['inventory'].remove(item_id)
+    character['equipped_armor'] = item_id
+
+    return f"Equipped {item_id}, {stat_name} increased by {value}."
     # TODO: Implement armor equipping
     # Similar to equip_weapon but for armor
     
