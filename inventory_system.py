@@ -15,6 +15,7 @@ from custom_exceptions import (
     InsufficientResourcesError,
     InvalidItemTypeError
 )
+import game_data
 
 # Maximum inventory size
 MAX_INVENTORY_SIZE = 20
@@ -118,7 +119,7 @@ def clear_inventory(character):
 # ITEM USAGE
 # ============================================================================
 
-def use_item(character, item_id, item_data):
+def use_item(character, item_id, ):
     """
     Use a consumable item from inventory
     
@@ -136,14 +137,14 @@ def use_item(character, item_id, item_data):
         ItemNotFoundError if item not in inventory
         InvalidItemTypeError if item type is not 'consumable'
     """
-    if item_data['type'] != 'consumable':
+    if game_data.item_data[item_id]['type'] != 'consumable':
         raise InvalidItemTypeError(f"Cannot use item: {item_id} is not a consumable.")
     if item_id in character['inventory']:
-        stat_name, value = parse_item_effect(item_data['effect']) 
+        stat_name, value = parse_item_effect(game_data.item_data[item_id]['effect']) 
         apply_stat_effect(character, stat_name, value)
         # Remove item from inventory
         character['inventory'].remove(item_id)
-        return f"Used {item_data['name']}: {stat_name} increased by {value}."
+        return f"Used {game_data.item_data[item_id]['name']}: {stat_name} increased by {value}."
     else:
         raise ItemNotFoundError(f"Cannot use item: {item_id} not found in inventory.")
     # TODO: Implement item usage
@@ -154,7 +155,7 @@ def use_item(character, item_id, item_data):
     # Remove item from inventory
 
 
-def equip_weapon(character, item_id, item_data):
+def equip_weapon(character, item_id,):
     """
     Equip a weapon
     
@@ -176,12 +177,12 @@ def equip_weapon(character, item_id, item_data):
     """
     if item_id not in character['inventory']:
         raise ItemNotFoundError(f"Cannot equip item: {item_id} not found in inventory.")
-    if item_data['type'] != 'weapon':
+    if game_data.item_data[item_id]['type'] != 'weapon':
         raise InvalidItemTypeError(f"Cannot equip item: {item_id} is not a weapon.")
     if 'equipped_weapon' in character and character['equipped_weapon'] is not None:
         # Unequip current weapon
         unequipped_weapon_id = character['equipped_weapon']
-        unequipped_weapon_data = item_data[unequipped_weapon_id]
+        unequipped_weapon_data = game_data.item_data[unequipped_weapon_id]
         stat_name, value = parse_item_effect(unequipped_weapon_data['effect'])
         apply_stat_effect(character, stat_name, -value)  # Remove bonus
         character['inventory'].append(unequipped_weapon_id)  # Add back to inventory
@@ -194,7 +195,7 @@ def equip_weapon(character, item_id, item_data):
     # Remove item from inventory
     
 
-def equip_armor(character, item_id, item_data):
+def equip_armor(character, item_id,):
     """
     Equip armor
     
@@ -216,12 +217,12 @@ def equip_armor(character, item_id, item_data):
     """
     if item_id not in character['inventory']:
         raise ItemNotFoundError(f"Cannot equip item: {item_id} not found in inventory.")
-    if item_data['type'] != 'armor':
+    if game_data.item_data[item_id]['type'] != 'armor':
         raise InvalidItemTypeError(f"Cannot equip item: {item_id} is not armor.")
     if 'equipped_armor' in character and character['equipped_armor'] is not None:
         # Unequip current armor
         unequipped_armor_id = character['equipped_armor']
-        unequipped_armor_data = item_data[unequipped_armor_id]
+        unequipped_armor_data = game_data.item_data[unequipped_armor_id]
         stat_name, value = parse_item_effect(unequipped_armor_data['effect'])
         apply_stat_effect(character, stat_name, -value)  # Remove bonus
         character['inventory'].append(unequipped_armor_id)  # Add back to inventory
