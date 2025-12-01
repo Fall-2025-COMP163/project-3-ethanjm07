@@ -156,7 +156,7 @@ def load_character(character_name, save_directory="data/save_games"):
 
     key, value = line.split(":")
 
-    if key == "NAME":
+    if key == "name":
         character['name'] = value
     elif key == "CLASS":
         character['class'] = value
