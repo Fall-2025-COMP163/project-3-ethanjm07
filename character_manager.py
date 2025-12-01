@@ -154,33 +154,33 @@ def load_character(character_name, save_directory="data/save_games"):
 
     #
 
-    key, value = line.split(":")
+        key, value = line.split(":")
 
-    if key == "name":
-        character['name'] = value
-    elif key == "CLASS":
-        character['class'] = value
-    elif key == "LEVEL":
-        character['level'] = int(value)
-    elif key == "HEALTH":
-        character['health'] = int(value)
-    elif key == "MAX_HEALTH":
-        character['max_health'] = int(value)
-    elif key == "STRENGTH":
-        character['strength'] = int(value)
-    elif key == "MAGIC":
-        character['magic'] = int(value)
-    elif key == "EXPERIENCE":
-        character['experience'] = int(value)
-    elif key == "GOLD":
-        character['gold'] = int(value)
-    elif key == "INVENTORY":
-        character['inventory'] = value.split(",") if value else []
-    elif key == "ACTIVE_QUESTS":
-        character['active_quests'] = value.split(",") if value else []
-    elif key == "COMPLETED_QUESTS":
-        character['completed_quests'] = value.split(",") if value else []
-    return character
+        if key == "NAME":
+            character['name'] = value
+        elif key == "CLASS":
+            character['class'] = value
+        elif key == "LEVEL":
+            character['level'] = int(value)
+        elif key == "HEALTH":
+            character['health'] = int(value)
+        elif key == "MAX_HEALTH":
+            character['max_health'] = int(value)
+        elif key == "STRENGTH":
+            character['strength'] = int(value)
+        elif key == "MAGIC":
+            character['magic'] = int(value)
+        elif key == "EXPERIENCE":
+            character['experience'] = int(value)
+        elif key == "GOLD":
+            character['gold'] = int(value)
+        elif key == "INVENTORY":
+            character['inventory'] = value.split(",") if value else []
+        elif key == "ACTIVE_QUESTS":
+            character['active_quests'] = value.split(",") if value else []
+        elif key == "COMPLETED_QUESTS":
+            character['completed_quests'] = value.split(",") if value else []
+    return print(character)
     # TODO: Implement load functionality
     # Check if file exists → CharacterNotFoundError
     # Try to read file → SaveFileCorruptedError
