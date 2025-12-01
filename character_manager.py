@@ -98,10 +98,13 @@ def save_character(character, save_directory="data/save_games"):
     Returns: True if successful
     Raises: PermissionError, IOError (let them propagate or handle)
     """
+    # TODO: Implement save functionality
+    # Create save_directory if it doesn't exist
+    # Handle any file I/O errors appropriately
+    # Lists should be saved as comma-separated values
     if not os.path.exists(save_directory):
         os.makedirs(save_directory)
     filename = os.path.join(save_directory, f"{character['name']}_save.txt")
-
     with open(filename, "w") as file:
         file.write(f"NAME: {character['name']}\n")
         file.write(f"CLASS: {character['class']}\n")
@@ -112,18 +115,10 @@ def save_character(character, save_directory="data/save_games"):
         file.write(f"MAGIC: {character['magic']}\n")
         file.write(f"EXPERIENCE: {character['experience']}\n")
         file.write(f"GOLD: {character['gold']}\n")
-        inventory_str = ",".join(character['inventory'])
-        file.write(f"INVENTORY: {inventory_str}\n")
-        active_quests_str = ",".join(character['active_quests'])
-        file.write(f"ACTIVE_QUESTS: {active_quests_str}\n")
-        completed_quests_str = ",".join(character['completed_quests'])
-        file.write(f"COMPLETED_QUESTS: {completed_quests_str}\n")
+        file.write(f"INVENTORY: {','.join(character['inventory'])}\n")
+        file.write(f"ACTIVE_QUESTS: {','.join(character['active_quests'])}\n")
+        file.write(f"COMPLETED_QUESTS: {','.join(character['completed_quests'])}\n")
     return True
-    # TODO: Implement save functionality
-    # Create save_directory if it doesn't exist
-    # Handle any file I/O errors appropriately
-    # Lists should be saved as comma-separated values
-    pass
 
 def load_character(character_name, save_directory="data/save_games"):
     """
@@ -170,11 +165,11 @@ def load_character(character_name, save_directory="data/save_games"):
             elif key == "GOLD":
                 character['gold'] = int(value)
             elif key == "INVENTORY":
-                character['inventory'] = value.split(",") if value else []
+                character['inventory'] = value.split(",") 
             elif key == "ACTIVE_QUESTS":
-                character['active_quests'] = value.split(",") if value else []
+                character['active_quests'] = value.split(",")
             elif key == "COMPLETED_QUESTS":
-                character['completed_quests'] = value.split(",") if value else []
+                character['completed_quests'] = value.split(",")
     except Exception as e:
         raise InvalidSaveDataError(f"Invalid save data format: {e}")
     return character
