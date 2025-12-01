@@ -149,7 +149,6 @@ def game_loop():
     
     while game_running:
         print("\n=== GAME MENU ===")
-        print(game_menu())
         choice = game_menu()
         if choice == 1:
             view_character_stats()
@@ -196,12 +195,9 @@ def game_menu():
     print("4. Explore (Find Battles)")
     print("5. Shop")
     print("6. Save and Quit")
-    choice = input("Enter your choice (1-6): ")
     try:
-        choice_int = int(choice)
-        if choice_int in [1, 2, 3, 4, 5, 6]:
-            return choice_int
-        else:
+        choice_int = int(input("Enter your choice (1-6): "))
+        if choice_int not in [1, 2, 3, 4, 5, 6]:
             print("Invalid choice. Please select 1-6.")
             return game_menu()
     except ValueError:
@@ -275,52 +271,79 @@ def quest_menu():
     """Quest management menu"""
     global current_character, all_quests
     
-    print("\n=== QUEST MENU ===")
-    print("Options:")
-    print("1. View Active Quests")
-    print("2. View Available Quests")
-    print("3. View Completed Quests")
-    print("4. Accept Quest")
-    print("5. Abandon Quest")
-    print("6. Complete Quest (for testing)")
-    print("7. Back to Game Menu")
-    try:
-        choice = int(input("Choose an option: "))
+    while True:
+        print("\n=== QUEST MENU ===")
+        print("1. View Active Quests")
+        print("2. View Available Quests")
+        print("3. View Completed Quests")
+        print("4. Accept Quest")
+        print("5. Abandon Quest")
+        print("6. Complete Quest (for testing)")
+        print("7. Back to Game Menu")
+
+        try:
+            choice = int(input("Choose an option: "))
+        except ValueError:
+            print("Invalid input. Please enter a number between 1 and 7.")
+            continue
+
         if choice == 1:
-            active_quests = [all_quests[qid] for qid in current_character.active_quests]
-            quest_handler.display_quest_list(active_quests)
+            # Get active quests safely
+            active_quests = quest_handler.get_active_quests(current_character, all_quests)
+            if active_quests:
+                quest_handler.display_quest_list(active_quests)
+            else:
+                print("You have no active quests.")
+
         elif choice == 2:
-            available_quests = quest_handler.get_available_quests(current_character.to_dict(), all_quests)
-            quest_handler.display_quest_list(available_quests)
+            # Get available quests safely
+            available_quests = quest_handler.get_available_quests(current_character, all_quests)
+            if available_quests:
+                quest_handler.display_quest_list(available_quests)
+            else:
+                print("No quests are currently available to accept.")
+
         elif choice == 3:
-            completed_quests = [all_quests[qid] for qid in current_character.completed_quests]
-            quest_handler.display_quest_list(completed_quests)
+            # Get completed quests safely
+            completed_quests = quest_handler.get_completed_quests(current_character, all_quests)
+            if completed_quests:
+                quest_handler.display_quest_list(completed_quests)
+            else:
+                print("You have not completed any quests yet.")
+
         elif choice == 4:
             quest_id = input("Enter the Quest ID to accept: ")
-            quest_handler.accept_quest(current_character.to_dict(), quest_id, all_quests)
-            character_manager.save_character(current_character)
-            print(f"Quest {quest_id} accepted!")
+            try:
+                quest_handler.accept_quest(current_character, quest_id, all_quests)
+                character_manager.save_character(current_character)
+                print(f"Quest '{quest_id}' accepted!")
+            except (QuestNotFoundError, InsufficientLevelError, QuestRequirementsNotMetError, QuestAlreadyCompletedError) as e:
+                print(f"Cannot accept quest: {e}")
+
         elif choice == 5:
             quest_id = input("Enter the Quest ID to abandon: ")
-            quest_handler.abandon_quest(current_character.to_dict(), quest_id)
-            character_manager.save_character(current_character)
-            print(f"Quest {quest_id} abandoned.")
+            try:
+                quest_handler.abandon_quest(current_character, quest_id)
+                character_manager.save_character(current_character)
+                print(f"Quest '{quest_id}' abandoned.")
+            except QuestNotActiveError as e:
+                print(f"Cannot abandon quest: {e}")
+
         elif choice == 6:
             quest_id = input("Enter the Quest ID to complete (testing only): ")
-            quest_handler.complete_quest(current_character.to_dict(), quest_id, all_quests)
-            character_manager.save_character(current_character)
-            print(f"Quest {quest_id} completed!")
+            try:
+                rewards = quest_handler.complete_quest(current_character, quest_id, all_quests)
+                character_manager.save_character(current_character)
+                print(f"Quest '{quest_id}' completed! Rewards: {rewards['reward_xp']} XP, {rewards['reward_gold']} Gold")
+            except (QuestNotFoundError, QuestNotActiveError) as e:
+                print(f"Cannot complete quest: {e}")
+
         elif choice == 7:
-            print("Returning to game menu...")
-            game_menu()
+            # Back to game menu
+            break
+
         else:
             print("Invalid choice. Please select 1-7.")
-    except ValueError:
-        print("Invalid input. Please enter a number between 1 and 7.")
-    except QuestNotFoundError as e:
-        print(f"Error: {e}")
-    except QuestRequirementsNotMetError as e:
-        print(f"Error: {e}")
     
 
 def explore():
