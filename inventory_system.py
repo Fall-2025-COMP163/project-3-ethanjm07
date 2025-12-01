@@ -179,11 +179,7 @@ def equip_weapon(character, item_id, item_data):
         raise InvalidItemTypeError(f"Cannot equip item: {item_id} is not a weapon.")
     if 'equipped_weapon' in character and character['equipped_weapon'] is not None:
         # Unequip current weapon
-        unequipped_weapon_id = character['equipped_weapon']
-        unequipped_weapon_data = item_data[unequipped_weapon_id]
-        stat_name, value = parse_item_effect(unequipped_weapon_data['effect'])
-        apply_stat_effect(character, stat_name, -value)  # Remove bonus
-        character['inventory'].append(unequipped_weapon_id)  # Add back to inventory
+        unequip_weapon(character, item_data)
     
     # TODO: Implement weapon equipping
     # Check item exists and is type 'weapon'
@@ -219,12 +215,7 @@ def equip_armor(character, item_id, item_data):
         raise InvalidItemTypeError(f"Cannot equip item: {item_id} is not armor.")
     if 'equipped_armor' in character and character['equipped_armor'] is not None:
         # Unequip current armor
-        unequipped_armor_id = character['equipped_armor']
-        unequipped_armor_data = item_data[unequipped_armor_id]
-        stat_name, value = parse_item_effect(unequipped_armor_data['effect'])
-        apply_stat_effect(character, stat_name, -value)  # Remove bonus
-        character['inventory'].append(unequipped_armor_id)  # Add back to inventory
-    
+        unequip_armor(character, item_data)
     # TODO: Implement armor equipping
     # Similar to equip_weapon but for armor
     
@@ -241,7 +232,6 @@ def unequip_weapon(character,item_data):
     if len(character['inventory']) >= MAX_INVENTORY_SIZE:
         raise InventoryFullError("Cannot unequip weapon: Inventory is full.")
     weapon_id = character['equipped_weapon']
-
     weapon_data = item_data(weapon_id)
     stat_name, value = parse_item_effect(weapon_data['effect'])
     apply_stat_effect(character, stat_name, -value)  # Remove bonus
@@ -292,11 +282,12 @@ def purchase_item(character, item_id, item_data):
         InsufficientResourcesError if not enough gold
         InventoryFullError if inventory is full
     """
-    if character['gold'] < item_data[item_id]['cost']:
+    cost = item_data[item_id]['cost']
+    if character['gold'] < cost:
         raise InsufficientResourcesError("Cannot purchase item: Not enough gold.")
     if len(character['inventory']) >= MAX_INVENTORY_SIZE:
         raise InventoryFullError("Cannot purchase item: Inventory is full.")
-    character['gold'] -= item_data[item_id]['cost']
+    character['gold'] -= cost
     character['inventory'].append(item_id)
     return True
     # TODO: Implement purchasing
