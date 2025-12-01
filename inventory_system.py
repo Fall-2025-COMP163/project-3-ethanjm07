@@ -15,7 +15,7 @@ from custom_exceptions import (
     InsufficientResourcesError,
     InvalidItemTypeError
 )
-import game_data
+
 
 # Maximum inventory size
 MAX_INVENTORY_SIZE = 20
@@ -119,7 +119,7 @@ def clear_inventory(character):
 # ITEM USAGE
 # ============================================================================
 
-def use_item(character, item_id):
+def use_item(character, item_id, item_data):
     """
     Use a consumable item from inventory
     
@@ -137,16 +137,14 @@ def use_item(character, item_id):
         ItemNotFoundError if item not in inventory
         InvalidItemTypeError if item type is not 'consumable'
     """
-    if game_data.item_data[item_id]['type'] != 'consumable':
-        raise InvalidItemTypeError(f"Cannot use item: {item_id} is not a consumable.")
-    if item_id in character['inventory']:
-        stat_name, value = parse_item_effect(game_data.item_data[item_id]['effect']) 
-        apply_stat_effect(character, stat_name, value)
-        # Remove item from inventory
-        character['inventory'].remove(item_id)
-        return f"Used {game_data.item_data[item_id]['name']}: {stat_name} increased by {value}."
-    else:
+    if item_id not in character['inventory']:
         raise ItemNotFoundError(f"Cannot use item: {item_id} not found in inventory.")
+    if item_data['type'] != 'consumable':
+        raise InvalidItemTypeError(f"Cannot use item: {item_id} is not consumable.")
+    stat_name, value = parse_item_effect(item_data['effect'])
+    apply_stat_effect(character, stat_name, value)
+    character['inventory'].remove(item_id)
+    return f"Used {item_id}, {stat_name} increased by {value}."
     # TODO: Implement item usage
     # Check if character has the item
     # Check if item type is 'consumable'
