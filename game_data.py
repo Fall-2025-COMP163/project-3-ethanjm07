@@ -36,61 +36,34 @@ def load_quests(filename="data/quests.txt"):
     Returns: Dictionary of quests {quest_id: quest_data_dict}
     Raises: MissingDataFileError, InvalidDataFormatError, CorruptedDataError
     """
-    # 1. Try opening file
+    quests = {}
     try:
         with open(filename, "r") as f:
-            try:
-                content = f.read()
-            except Exception:
-                raise CorruptedDataError("Quest file is unreadable or corrupted.")
+            content = f.read()
     except FileNotFoundError:
-        raise MissingDataFileError(f"Quest file not found: {filename}")
-    # 2. Split quests by blank lines
-    blocks = [block.strip() for block in content.split("\n\n") if block.strip()]
+        raise MissingDataFileError(f"Quest file '{filename}' not found.")
+    except Exception:
+        raise CorruptedDataError("Quest file is unreadable or corrupted.")
 
-    quests = {}
-
-    required_fields = [
-        "QUEST_ID", "TITLE", "DESCRIPTION",
-        "REWARD_XP", "REWARD_GOLD", "REQUIRED_LEVEL",
-        "PREREQUISITE"
-    ]
-    # 3. Parse each block
-    for block in blocks:
-        lines = block.split("\n")
+    # Split quests by blank lines
+    quest_blocks = content.strip().split("\n\n")
+    for block in quest_blocks:
+        lines = block.strip().split("\n")
         quest_data = {}
-
+        quest_id = None
         for line in lines:
-            if ":" not in line:
-                raise InvalidDataFormatError(f"Invalid line: {line}")
-
-            key, value = line.split(":", 1)
+            if ": " not in line:
+                raise InvalidDataFormatError(f"Malformed line: {line}")
+            key, value = line.split(": ", 1)
             key = key.strip()
             value = value.strip()
-
-            quest_data[key] = value
-        # 4. Validate required fields
-        for req in required_fields:
-            if req not in quest_data:
-                raise InvalidDataFormatError(f"Missing field {req} in quest block: {block}")
-
-        # Convert numbers
-        try:
-            reward_xp = int(quest_data["REWARD_XP"])
-            reward_gold = int(quest_data["REWARD_GOLD"])
-            required_level = int(quest_data["REQUIRED_LEVEL"])
-        except ValueError:
-            raise InvalidDataFormatError("XP, gold, or level field is not a valid number.")
-        prerequisite = quest_data["PREREQUISITE"]
-        # Build final quest dict entry
-        quests[quest_data["QUEST_ID"]] = {
-            "title": quest_data["TITLE"],
-            "description": quest_data["DESCRIPTION"],
-            "reward_xp": reward_xp,
-            "reward_gold": reward_gold,
-            "required_level": required_level,
-            "prerequisite": prerequisite
-        }
+            if key == "QUEST_ID":
+                quest_id = value
+            else:
+                quest_data[key.lower()] = value
+        if not quest_id:
+            raise InvalidDataFormatError("Quest ID missing in block")
+        quests[quest_id] = quest_data
 
     return quests
     # TODO: Implement this function
