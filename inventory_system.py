@@ -326,7 +326,7 @@ def sell_item(character, item_id, item_data):
     """
     if item_id not in character['inventory']:
         raise ItemNotFoundError(f"Cannot sell item: {item_id} not found in inventory.")
-    sell_price = item_data[item_id]['cost'] // 2
+    sell_price = item_data['cost'] // 2
     character['inventory'].remove(item_id)
     character['gold'] += sell_price
     return sell_price
