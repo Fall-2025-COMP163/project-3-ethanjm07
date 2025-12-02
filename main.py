@@ -373,12 +373,25 @@ def shop():
     if choice == "1":
         print("What would you like to buy?")
         item = input("Enter the item name: ")
-        inventory_system.purchase_item(current_character, item, 25)
+        if item not in all_items:
+            print("Item not found in shop.")
+            return
+        try:
+            inventory_system.purchase_item(current_character, item, item_data=all_items[item])
+            print(f"You purchased {all_items[item]['name']}!")
+        except (InsufficientResourcesError, InventoryFullError) as e:
+            print(f"Cannot purchase item: {e}")    
     elif choice == "2":
-        inventory_system.sell_item(current_character, all_items)
+        print("What would you like to sell?")
+        item = input("Enter the item name: ")
+        try:
+            inventory_system.sell_item(current_character, item)
+            print(f"You sold {all_items[item]['name']}!")
+        except ItemNotFoundError as e:
+            print(f"Cannot sell item: {e}")
     else:
         print("Leaving shop...")
-        game_menu()
+        return
     # TODO: Implement shop
     # Show available items for purchase
     # Show current gold
