@@ -9,7 +9,7 @@ AI Usage: [Document any AI assistance used]
 Handles combat mechanics
 """
 
-from random import random
+import random
 from custom_exceptions import (
     InvalidTargetError,
     CombatNotActiveError,
@@ -79,9 +79,9 @@ def get_random_enemy_for_level(character_level):
     
     Returns: Enemy dictionary
     """
-    if 1 <= character_level <= 2:
+    if character_level == 2:
         return create_enemy("goblin")
-    elif 3 <= character_level <= 5:
+    elif character_level <= 5:
         return create_enemy("orc")
     elif character_level >= 6:
         return create_enemy("dragon")
@@ -131,11 +131,11 @@ class SimpleBattle:
             self.turn_counter += 1
             # Player's turn
             self.player_turn()
-            if not self.combat_active:
+            if self.combat_active == False:
                 break
             # Enemy's turn
             self.enemy_turn()
-            if not self.combat_active:
+            if self.combat_active == False:
                 break
 
         winner = self.check_battle_end()
@@ -143,8 +143,10 @@ class SimpleBattle:
             xp_gained = self.enemy['xp_reward']
             gold_gained = self.enemy['gold_reward']
             return {'winner': 'player', 'xp_gained': xp_gained, 'gold_gained': gold_gained}
-        else:
+        elif winner == 'enemy':
             raise CharacterDeadError("Character has been defeated in battle.")
+        else:
+            return {'winner': 'none', 'xp_gained': 0, 'gold_gained': 0}
         # TODO: Implement battle loop
         # Check character isn't dead
         # Loop until someone dies
@@ -255,7 +257,7 @@ class SimpleBattle:
             return 'enemy'
         else:
             return None
-        # TODO: Implement battle end check
+        
         pass
     
     def attempt_escape(self):
@@ -266,10 +268,12 @@ class SimpleBattle:
         
         Returns: True if escaped, False if failed
         """
-        success = random.random() < 0.5
+        success = random.randint(0,1) == 0
         if success:
             self.combat_active = False
-        return success
+            return True
+        else:
+            return False
         # TODO: Implement escape attempt
         # Use random number or simple calculation
         # If successful, set combat_active to False
@@ -307,6 +311,7 @@ def use_special_ability(character, enemy):
         return "Cleric casts Heal!"
     else:
         return "No special ability available."
+    
     # TODO: Implement special abilities
     # Check character class
     # Execute appropriate ability

@@ -148,31 +148,15 @@ def game_loop():
     game_running = True
     
     while game_running:
-        print("\n=== GAME MENU ===")
-        choice = game_menu()
-        if choice == 1:
-            view_character_stats()
-        elif choice == 2:   
-            view_inventory()
-        elif choice == 3:
-            quest_menu()
-        elif choice == 4:
-            explore()
-        elif choice == 5:
-            shop()
-        elif choice == 6:   
-            save_game()
-            print("Game saved. Exiting to main menu.")
-            game_running = False
-        else:
-            print("Invalid choice. Please select 1-6.")
+        game_menu()
+        choice = input("Enter your choice (1-6): ")
     # TODO: Implement game loop
     # While game_running:
     #   Display game menu
     #   Get player choice
     #   Execute chosen action
     #   Save game after each action
-    pass
+    
 
 def game_menu():
     """
@@ -195,9 +179,28 @@ def game_menu():
     print("4. Explore (Find Battles)")
     print("5. Shop")
     print("6. Save and Quit")
+    
+    choice = input("Enter your choice (1-6): ")
     try:
-        choice_int = int(input("Enter your choice (1-6): "))
-        if choice_int not in [1, 2, 3, 4, 5, 6]:
+        choice_int = int(choice)
+        if choice_int in [1, 2, 3, 4, 5, 6]:
+            if choice_int == 1:
+                view_character_stats()
+            elif choice_int == 2:
+                view_inventory()
+            elif choice_int == 3:
+                quest_menu()
+            elif choice_int == 4:
+                explore()
+            elif choice_int == 5:
+                shop()
+            elif choice_int == 6:
+                save_game()
+                global game_running
+                game_running = False
+                print("Exiting to main menu...")
+            return choice_int
+        else:
             print("Invalid choice. Please select 1-6.")
             return game_menu()
     except ValueError:
@@ -213,30 +216,20 @@ def game_menu():
 def view_character_stats():
     """Display character information"""
     global current_character
-    print("\n=== CHARACTER STATS ===")
-    print(f"Name: {current_character.name}")
-    print(f"Class: {current_character.char_class}")
-    print(f"Level: {current_character.level}")
-    print(f"Health: {current_character.health}/{current_character.max_health}")
-    print(f"Gold: {current_character.gold}")
-    print("Stats:")
-    for stat, value in current_character.stats.items():
-        print(f"  {stat}: {value}")
-    print("\nQuest Progress:")
-    quest_handler.display_character_quest_progress(current_character.to_dict(), all_quests)
     
-
+    print("\n=== CHARACTER STATS ===")
+    character_manager.display_character_stats(current_character)
 def view_inventory():
     """Display and manage inventory"""
     global current_character, all_items
     
     print("\n=== INVENTORY ===")
 
-    if not current_character.inventory:
+    if not inventory_system.display_inventory(current_character, all_items):
         print("Your inventory is empty.")
         return
     
-    unique_items = list(set(current_character.inventory))
+    unique_items = list(set(inventory_system.display_inventory(current_character, all_items)))
     for i, item_id in enumerate(unique_items, 1):
         item_name = all_items[item_id]["name"]
         count = current_character.inventory.count(item_id)
@@ -285,7 +278,7 @@ def quest_menu():
             choice = int(input("Choose an option: "))
         except ValueError:
             print("Invalid input. Please enter a number between 1 and 7.")
-            continue
+            
 
         if choice == 1:
             # Get active quests safely
@@ -355,15 +348,15 @@ def explore():
     # Start combat with combat_system.SimpleBattle
     # Handle combat results (XP, gold, death)
     # Handle exceptions
-    enemy = combat_system.get_random_enemy_for_level(current_character.level)
+    enemy = combat_system.get_random_enemy_for_level(current_character['level'])
     battle = combat_system.SimpleBattle(current_character, enemy)
     result = battle.start_battle()
     if result == "victory":
-        print(f"You defeated the {enemy.name}!")
-        current_character.gold += enemy.gold_reward
-        current_character.gain_xp(enemy.xp_reward)
+        print(f"You defeated the {enemy['name']}!")
+        current_character.gold += enemy['gold_reward']
+        current_character.gain_xp(enemy['xp_reward'])
         character_manager.save_character(current_character)
-        print(f"You earned {enemy.xp_reward} XP and {enemy.gold_reward} gold.")
+        print(f"You earned {enemy['xp_reward']} XP and {enemy['gold_reward']} gold.")
     elif result == "defeat":
         print("You have been defeated...")
         handle_character_death()
@@ -375,10 +368,12 @@ def shop():
     print("\n=== SHOP ===")
     print("1. Buy items")
     print("2. Sell items")
-    print(f"\nYour Gold: {current_character.gold}")
+    print(f"\nYour Gold: {current_character['gold']}")
     choice = input("Choose an option: ")
     if choice == "1":
-        inventory_system.purchase_item(current_character, all_items)
+        print("What would you like to buy?")
+        item = input("Enter the item name: ")
+        inventory_system.purchase_item(current_character, item, 25)
     elif choice == "2":
         inventory_system.sell_item(current_character, all_items)
     else:

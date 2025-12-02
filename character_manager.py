@@ -325,7 +325,12 @@ def revive_character(character):
     return True
     # TODO: Implement revival
     # Restore health to half of max_health
-    pass
+
+def display_character_stats(character):
+    """
+    Display character stats in a readable format
+    """
+    return print(load_character(character))
 
 # ============================================================================
 # VALIDATION
@@ -356,7 +361,7 @@ def validate_character_data(character):
     # Check all required keys exist
     # Check that numeric values are numbers
     # Check that lists are actually lists
-    pass
+    return True
 
 # ============================================================================
 # TESTING

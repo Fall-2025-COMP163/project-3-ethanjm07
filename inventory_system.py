@@ -297,7 +297,7 @@ def purchase_item(character, item_id, item_data):
         InsufficientResourcesError if not enough gold
         InventoryFullError if inventory is full
     """
-    cost = item_data['cost']
+    cost = item_data
     if character['gold'] < cost:
         raise InsufficientResourcesError("Cannot purchase item: Not enough gold.")
     if len(character['inventory']) >= MAX_INVENTORY_SIZE:
